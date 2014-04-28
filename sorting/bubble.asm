@@ -1,19 +1,25 @@
 ;=========================================================================
-; About
+; Acerca
 ;
-; executes the sorting algorithm bubble (http://en.wikipedia.org/wiki/Bubble_sort)
-; you add numbers using the macro vector.add number, and run the program usin mplam
-; all numbers will be sorted and stored on RAM. 
-; The sorting process is help by pointer register (FSR and INDF).
+; Ejecuta el algoritmo de ordenamiento de la burbuja (http://es.wikipedia.org/wiki/Bubble_sort)
+; el ordenamiento se lleva a cabo utilizando el apuntador del microcontrolador (FSR and INDF)
+; es un procesamiento en memoria el que se lleva a cabo, asi que no tiene interaccion con los perifericos.
+; La manera de inicializar los numeros es utilizando una macro (vector.add) y con la ayuda 
+; del preprocesador de MPLAB se inicializa la memoria con los datos a ordenar.
+; Esta practica sirve para ver el funcionamiento del apuntador, asi como algunas caracteristicas 
+; del preprocesador.
+; Tambien se definen macros en el programa las cuales ayudaran de mucho en la reutilizacion de codigo.
 
 
 ;=========================================================================
-; Settings
+; Configuracion de procesador
+
   #include <p16f84.inc>
   list p=16f84
 
 ;=========================================================================
-; Configuration bits
+; Configuracion de fusibles
+
   __CONFIG _XT_OSC & _WDT_OFF & _PWRTE_ON & _CP_OFF
 
 ;=========================================================================
@@ -75,7 +81,7 @@ vector    equ 0x0C
   variable  vector.length = 0
   
 ;=========================================================================
-; Constants
+; Constantes
 
 cblock 0x40
   ptri
@@ -105,14 +111,14 @@ start:
   vector.add d'67'
   vector.add d'43'
   vector.add d'102'
-  ;para ingresar mas numeros solo ocupan: vector.add numero
+  ; para ingresar mas numeros solo ocupan: vector.add numero
   ; el programa calcula dinamicamente la longitud del vector
 
   movlw vector.length - 1
   movwf i
 
   movlw vector
-  movwf ptri        ; ptri = &vector
+  movwf ptri        ; ptri <- &vector (ptri almacenara la direccion de memoria de vector)
 
 @vector:
   movf  i, w
@@ -125,8 +131,8 @@ start:
 @test:
   popf  ptri, m_a
   popf  ptrj, m_b
-  greater m_a, m_b  ; w = ( m_a > m_b )
-  xorlw 0x01        ; w = !w
+  greater m_a, m_b  ; w <- ( m_a > m_b )
+  xorlw 0x01        ; w <- !w
   btfss STATUS, Z
   ;if ( !z ) {
     goto  @menor
