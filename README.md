@@ -1,4 +1,4 @@
 Pic-Microcontroller
 ===================
 
-Some testing and all stuff about pic asm programming
+  Algunas cosas en relacion a la programacion de pics utilizando asm.
