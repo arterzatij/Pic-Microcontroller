@@ -25,6 +25,11 @@
 ;=========================================================================
 ; Macros
 
+;-------------------------------------------------------------
+; Hace un pop a 'x' dada  la direccion 
+; del apuntador 
+; x <- &ptr 
+
 popf  macro ptr, x
     movf  ptr, w
     movwf FSR
@@ -32,12 +37,20 @@ popf  macro ptr, x
     movwf x
     endm
 
+;-------------------------------------------------------------
+; Hace un push a 'x' a la direccion 
+; del apuntador proporcionado 
+; &ptr <- x
+
 pushf macro ptr, x
     movf  ptr, w
     movwf FSR
     movf  x, w
     movwf INDF
     endm
+
+;-------------------------------------------------------------
+; Intercambia el valor de las localidades de memoria x <-> y
 
 swapff  macro x, y
     movf  x, w
@@ -47,6 +60,9 @@ swapff  macro x, y
     movf  temp, w
     movwf y
     endm
+
+;-------------------------------------------------------------
+; Verifica si x es mayor que y, si lo es w <- 1
 
 greater macro x, y
   local @true
@@ -84,13 +100,13 @@ vector    equ 0x0C
 ; Constantes
 
 cblock 0x40
-  ptri
-  ptrj
-  temp
-  m_a
-  m_b
-  i
-  j
+  ptri  ; Apuntador al indice 'i'
+  ptrj  ; Apuntador al indice 'j'
+  temp  ; Variable temporal
+  m_a   ; Valor a
+  m_b   ; Valor b
+  i     ; Indice 'i'
+  j     ; Indice 'j'
 endc
 
 ;=========================================================================
@@ -121,16 +137,16 @@ start:
   movwf ptri        ; ptri <- &vector (ptri almacenara la direccion de memoria de vector)
 
 @vector:
-  movf  i, w
-  movwf j
+  movf  i, w        ; 
+  movwf j           ; j <- i
 
   movf  ptri, w
-  movwf ptrj
-  incf  ptrj, f
+  movwf ptrj        ; ptrj <- ptri
+  incf  ptrj, f     ; ptrj <- ptrj + 1
 
 @test:
-  popf  ptri, m_a
-  popf  ptrj, m_b
+  popf  ptri, m_a   ; m_a <- vector[ptri]
+  popf  ptrj, m_b   ; m_b <- vector[ptrj]
   greater m_a, m_b  ; w <- ( m_a > m_b )
   xorlw 0x01        ; w <- !w
   btfss STATUS, Z
@@ -139,8 +155,8 @@ start:
   ;}
   ;else {
     swapff m_a, m_b
-    pushf ptri, m_a
-    pushf ptrj, m_b
+    pushf ptri, m_a ; vector[ptri] <- m_a
+    pushf ptrj, m_b ; vector[ptrj] <- m_b
   ;}
 @menor:
   incf  ptrj, f
